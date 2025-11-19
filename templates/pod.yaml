@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: {{ .Values.testPod.name }}
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app: gcp-wi-demo
+    {{- include "gcp-wi-app.labels" . | nindent 4 }}
+spec:
+  serviceAccountName: {{ .Values.app.serviceAccountName }}
+  restartPolicy: {{ .Values.testPod.restartPolicy }}
+  containers:
+    - name: app
+      image: {{ .Values.testPod.image }}
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          echo "Installing dependencies..."
+          pip install --quiet google-cloud-storage
+          echo ""
+          echo "Running test script..."
+          python3 /scripts/test.py
+      env:
+        - name: BUCKET_NAME
+          value: {{ .Values.gcp.bucketName }}
+        - name: GCP_PROJECT_ID
+          value: {{ .Values.gcp.projectId }}
+      volumeMounts:
+        - name: test-script
+          mountPath: /scripts
+          readOnly: true
+  volumes:
+    - name: test-script
+      configMap:
+        name: {{ .Values.testPod.name }}-script
+        defaultMode: 0755 

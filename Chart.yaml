@@ -1,0 +1,9 @@
+apiVersion: v2
+name: gcp-wi-app
+description: Demo application using GCP Workload Identity via Helm on GKE with Config Connector
+type: application
+version: 0.1.0
+appVersion: "1.0"
+maintainers:
+  - name: Chams Tmar
+    email: chams.tmar@pocteo.com
