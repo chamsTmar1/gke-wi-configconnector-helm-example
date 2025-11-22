@@ -34,14 +34,14 @@ The chart verifies:
 Set required values through Helm flags or a custom values file.
 
 Required values are:
-- gcp.projectId # Google Cloud project ID
-- gcp.gsaEmail # Email of the Google Service Account
-- gcp.bucketName # Target GCS bucket name
-- app.namespace # Kubernetes namespace for deployment
+- `gcp.projectId # Google Cloud project ID`
+- `gcp.gsaEmail # Email of the Google Service Account`
+- `gcp.bucketName # Target GCS bucket name`
+- `app.namespace # Kubernetes namespace for deployment`
 
 ## Installation
 
-a/ Using command-line flags:
+**a/ Using command-line flags:**
 
 ```
 helm install wi-test . \
@@ -51,7 +51,7 @@ helm install wi-test . \
   --set app.namespace=<NAMESPACE>
 ```
 
-b/ Using a values file:
+**b/ Using a values file:**
 
 `helm install wi-test . -f my-values.yaml`
 
