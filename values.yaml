@@ -2,14 +2,18 @@ gcp:
   projectId: ""
   gsaEmail: ""
   bucketName: ""
+  oidcProviderUrl: ""
+  # Token audience for service account projection
+  # Options:
+  #   - Full WIF provider URL (e.g., "//iam.googleapis.com/projects/.../providers/...")
+  #   - Custom audience (e.g., "whatever.com")
+  tokenAudience: ""
 
-# Kubernetes Configuration
 app:
   namespace: ""
   serviceAccountName: "app-ksa"
 
-# Test Pod Configuration
 testPod:
   name: "gcp-wi-test-pod"
   image: "python:3.11-slim"
-  restartPolicy: "Never" 
+  restartPolicy: "Never"

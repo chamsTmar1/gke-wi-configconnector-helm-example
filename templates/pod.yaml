@@ -18,6 +18,25 @@ spec:
           echo "Installing dependencies..."
           pip install --quiet google-cloud-storage
           echo ""
+          echo "Checking mounted volumes..."
+          ls -la /var/run/secrets/tokens/gcp-ksa/ || echo "ERROR: Volume not mounted!"
+          echo ""
+          if [ -f /var/run/secrets/tokens/gcp-ksa/token ]; then
+            echo "Token file exists"
+            echo "Token length: $(wc -c < /var/run/secrets/tokens/gcp-ksa/token) bytes"
+          else
+            echo "Token file missing!"
+            exit 1
+          fi
+          echo ""
+          if [ -f /var/run/secrets/tokens/gcp-ksa/config ]; then
+            echo "Config file exists"
+            cat /var/run/secrets/tokens/gcp-ksa/config
+          else
+            echo "Config file missing!"
+            exit 1
+          fi
+          echo ""
           echo "Running test script..."
           python3 /scripts/test.py
       env:
@@ -25,12 +44,33 @@ spec:
           value: {{ .Values.gcp.bucketName }}
         - name: GCP_PROJECT_ID
           value: {{ .Values.gcp.projectId }}
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/run/secrets/tokens/gcp-ksa/config
+        - name: GOOGLE_CLOUD_PROJECT
+          value: {{ .Values.gcp.projectId }}
       volumeMounts:
         - name: test-script
           mountPath: /scripts
+          readOnly: true
+        - name: gcp-ksa
+          mountPath: /var/run/secrets/tokens/gcp-ksa
           readOnly: true
   volumes:
     - name: test-script
       configMap:
         name: {{ .Values.testPod.name }}-script
         defaultMode: 0755 
+    - name: gcp-ksa
+      projected:
+        defaultMode: 420
+        sources:
+          - serviceAccountToken:
+              path: token
+              audience: {{ .Values.gcp.tokenAudience | quote }}
+              expirationSeconds: 3600
+          - configMap:
+              name: sts-config
+              optional: false
+              items:
+              - key: config
+                path: config
